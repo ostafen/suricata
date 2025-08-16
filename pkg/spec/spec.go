@@ -76,6 +76,16 @@ func LoadSpec(path string) (*Spec, error) {
 	return &spec, spec.Validate()
 }
 
+// isPrimitiveType checks if the given type is a built-in primitive type
+func isPrimitiveType(t string) bool {
+	switch t {
+	case "string", "int", "int32", "int64", "float", "float32", "float64", "bool", "datetime":
+		return true
+	default:
+		return false
+	}
+}
+
 func (spec *Spec) Validate() error {
 	if spec.Version == "" {
 		return fmt.Errorf("spec: version is required")
@@ -105,6 +115,12 @@ func (spec *Spec) validateMessages() error {
 			}
 			if field.Type == "" {
 				return fmt.Errorf("spec: field %q in message %q has empty type", field.Name, name)
+			}
+			// Validate field type existence
+			if !isPrimitiveType(field.Type) {
+				if _, ok := spec.Messages[field.Type]; !ok {
+					return fmt.Errorf("spec: field %q in message %q references undefined type %q", field.Name, name, field.Type)
+				}
 			}
 		}
 	}

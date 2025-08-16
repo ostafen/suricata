@@ -92,6 +92,8 @@ func (gen *JSONSchemaGenerator) fieldToSchema(field spec.Field, allMessages map[
 		baseSchema = map[string]any{"type": "number"}
 	case "bool":
 		baseSchema = map[string]any{"type": "boolean"}
+	case "datetime":
+		baseSchema = map[string]any{"type": "string", "format": "date-time"} // RFC3339
 	default:
 		// Custom type - lookup in allMessages
 		msg, ok := allMessages[field.Type]
